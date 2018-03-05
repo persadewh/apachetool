@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.RichTextString;
@@ -125,6 +126,10 @@ public class Excel {
 		else {
 			wb.createSheet(Constants.DEFAULTSHEETNAME);
 		}
+	}
+	
+	public static void autoSizeColumn(Sheet sheet) {
+		sheet.autoSizeColumn((short)2);
 	}
 	
 	public static String getValidationSheetName(String sheetName) {
@@ -242,8 +247,31 @@ public class Excel {
 		cellStyle.setFillPattern(fillPatternType);
 	}
 	
+	/**
+	 * You can use \n with word wrap on to create a new line in cell
+	 * But you must invoke setWrapText function
+	 * @param cellStyle
+	 */
+	public static void setWrapText(CellStyle cellStyle) {
+		cellStyle.setWrapText(true);
+	}
+	
 	public static CellStyle createCellStyle(Workbook wb) {
 		return wb.createCellStyle();
+	}
+	
+	/**
+	 * You should re-use fonts in your applications instead of creating a font for each cell.
+	 * 
+	 * @param cellStyle
+	 * @param font
+	 */
+	public static void setFont(CellStyle cellStyle, Font font) {
+		cellStyle.setFont(font);
+	}
+	
+	public static Font createFont(Workbook wb) {
+		return wb.createFont();
 	}
 	
 	public static String getCellValue(Cell cell) {

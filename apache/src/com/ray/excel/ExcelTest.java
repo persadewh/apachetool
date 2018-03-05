@@ -44,11 +44,14 @@ public class ExcelTest {
 			
 			Sheet sheet = Excel.getSheetByName(wb, "Y");
 			
+			//Excel.autoSizeColumn(sheet);
+			
 			Row row = Excel.createRow(sheet, 0);
 			Cell cell = Excel.createCell(row, 0);
-			cell.setCellValue("This is my test cell");
+			cell.setCellValue("This is \n my test cell");
 			
 			CellStyle cellStyle = Excel.createCellStyle(wb);
+			Excel.setWrapText(cellStyle);
 			
 			Excel.setAlignment(cellStyle, HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
 			Excel.setBorder(cellStyle, BorderStyle.DOUBLE, 
