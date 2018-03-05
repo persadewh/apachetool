@@ -6,21 +6,32 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.examples.CellTypes;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.microsoft.schemas.office.visio.x2012.main.CellType;
 
 public class Excel {
 
@@ -162,6 +173,86 @@ public class Excel {
 		return cell;
 	}
 	
+	/**
+	 * HorizontalAlignment
+	 * VerticalAlignment
+	 * @param cellStyle
+	 * @param halign
+	 * @param valign
+	 */
+	public static void setAlignment(CellStyle cellStyle, HorizontalAlignment halign, VerticalAlignment valign) {
+		cellStyle.setAlignment(halign);
+		cellStyle.setVerticalAlignment(valign);
+	}
+	
+	/**
+	 * BorderStyle
+	 * IndexedColors
+	 * @param cellStyle
+	 * @param topBorderStyle
+	 * @param bottomBorderStyle
+	 * @param leftBorderStyle
+	 * @param rightBorderStyle
+	 * @param topBorderColor
+	 * @param bottomBorderColor
+	 * @param leftBorderColor
+	 * @param rightBorderColor
+	 */
+	public static void setBorder(CellStyle cellStyle, 
+			BorderStyle topBorderStyle, 
+			BorderStyle bottomBorderStyle, 
+			BorderStyle leftBorderStyle, 
+			BorderStyle rightBorderStyle, 
+			short topBorderColor, 
+			short bottomBorderColor, 
+			short leftBorderColor, 
+			short rightBorderColor) {
+		
+		cellStyle.setBorderBottom(bottomBorderStyle);
+		cellStyle.setBottomBorderColor(bottomBorderColor);
+	    cellStyle.setBorderLeft(leftBorderStyle);
+	    cellStyle.setLeftBorderColor(leftBorderColor);
+	    cellStyle.setBorderRight(rightBorderStyle);
+	    cellStyle.setRightBorderColor(rightBorderColor);
+	    cellStyle.setBorderTop(topBorderStyle);
+	    cellStyle.setTopBorderColor(topBorderColor);
+		
+	}
+	
+	public static CellStyle createCellStyle(Workbook wb) {
+		return wb.createCellStyle();
+	}
+	
+	public static String getCellValue(Cell cell) {
+		String value = "";
+		if(null != cell) {
+			switch(cell.getCellType()) {
+			case Cell.CELL_TYPE_STRING:
+				value = cell.getRichStringCellValue().getString();
+				break;
+			case Cell.CELL_TYPE_NUMERIC:
+				if(DateUtil.isCellDateFormatted(cell)) {
+					Date date = cell.getDateCellValue();
+					value = date.toLocaleString();
+				}else {
+					value = String.valueOf(cell.getNumericCellValue());
+				}
+				break;
+			case Cell.CELL_TYPE_BOOLEAN:
+				value = String.valueOf(cell.getBooleanCellValue());
+				break;
+			case Cell.CELL_TYPE_FORMULA:
+				value = cell.getCellFormula();
+				break;
+			case Cell.CELL_TYPE_BLANK:
+				value = "";
+				break;
+			default:
+				value = "";
+			}
+		}
+		return value;
+	}
 	
 	
 	public static RichTextString createRichTextString(Workbook wb, String str) {
@@ -175,7 +266,7 @@ public class Excel {
 	/**
 	 * Use a file
 	 * @param excelFilePath
-	 * @return
+	 * @return Workbook
 	 * @throws EncryptedDocumentException
 	 * @throws InvalidFormatException
 	 * @throws IOException
@@ -187,7 +278,7 @@ public class Excel {
 	/**
 	 * Use an InputStream, needs more memory
 	 * @param excelFilePath
-	 * @return
+	 * @return Workbook
 	 * @throws EncryptedDocumentException
 	 * @throws InvalidFormatException
 	 * @throws IOException
