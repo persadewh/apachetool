@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.usermodel.examples.CellTypes;
@@ -19,6 +20,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.RichTextString;
@@ -27,6 +29,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -136,6 +139,10 @@ public class Excel {
 		return wb.getSheetAt(num);
 	}
 	
+	public static void mergeCells(Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+		sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
+	}
+	
 	/**
 	 * Create a row. Rows are 0 based
 	 * @param sheet
@@ -219,6 +226,22 @@ public class Excel {
 		
 	}
 	
+	/**
+	 * style.setFillPattern(CellStyle.BIG_SPOTS);
+	 * @param cellStyle
+	 * @param backGroundColor
+	 * @param foreGroundColor
+	 * @param fillPatternType
+	 */
+	public static void setFill(CellStyle cellStyle, 
+			short backGroundColor, 
+			short foreGroundColor, 
+			FillPatternType fillPatternType ) {
+		cellStyle.setFillBackgroundColor(backGroundColor);
+		cellStyle.setFillForegroundColor(foreGroundColor);
+		cellStyle.setFillPattern(fillPatternType);
+	}
+	
 	public static CellStyle createCellStyle(Workbook wb) {
 		return wb.createCellStyle();
 	}
@@ -285,6 +308,19 @@ public class Excel {
 	 */
 	public static Workbook openWorkbookWithFactoryByStream(String excelFilePath) throws EncryptedDocumentException, InvalidFormatException, IOException {
 		return WorkbookFactory.create(new FileInputStream(excelFilePath));
+	}
+	
+	/**
+	 * get all text in excel
+	 * just for HSSF(xls)
+	 * @param wb
+	 * @return text
+	 */
+	public static String textExtraction(HSSFWorkbook wb) {
+		ExcelExtractor extractor = new ExcelExtractor(wb);
+		extractor.setFormulasNotResults(true);
+		extractor.setIncludeSheetNames(false);
+		return extractor.getText();
 	}
 	
 }
