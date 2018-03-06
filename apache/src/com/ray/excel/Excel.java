@@ -19,11 +19,16 @@ import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Footer;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Hyperlink;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Name;
+import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -128,8 +133,8 @@ public class Excel {
 		}
 	}
 	
-	public static void autoSizeColumn(Sheet sheet) {
-		sheet.autoSizeColumn((short)2);
+	public static void autoSizeColumn(Sheet sheet, short index) {
+		sheet.autoSizeColumn(index);
 	}
 	
 	public static String getValidationSheetName(String sheetName) {
@@ -183,6 +188,20 @@ public class Excel {
 		cellStyle.setDataFormat(createHelper.createDataFormat().getFormat(dataFormat));
 		cell.setCellStyle(cellStyle);
 		return cell;
+	}
+	
+	public static Name createName(Workbook wb) {
+		return wb.createName();
+	}
+	
+	/**
+	 * reference as the following:
+	 * sheetName + “！A1：C5"
+	 * @param name
+	 * @param reference
+	 */
+	public static void setCellRefersToFormula(Name name, String reference) {
+		name.setRefersToFormula(reference);
 	}
 	
 	/**
@@ -270,8 +289,16 @@ public class Excel {
 		cellStyle.setFont(font);
 	}
 	
+	public static void setDataFormat(CellStyle cellStyle, DataFormat dataFormat, String formatString) {
+		cellStyle.setDataFormat(dataFormat.getFormat(formatString));
+	}
+	
 	public static Font createFont(Workbook wb) {
 		return wb.createFont();
+	}
+	
+	public static DataFormat createDataFormat(Workbook wb) {
+		return wb.createDataFormat();
 	}
 	
 	public static String getCellValue(Cell cell) {
@@ -351,4 +378,80 @@ public class Excel {
 		return extractor.getText();
 	}
 	
+	public static void fitSheetToOnePage(Sheet sheet) {
+		PrintSetup ps = sheet.getPrintSetup();
+		
+		sheet.setAutobreaks(true);
+		
+		ps.setFitHeight((short)1);
+		ps.setFitWidth((short)1);
+	}
+	
+	/**
+	 * index starts from 0
+	 * area value like "$A$1:$C$2"
+	 * @param wb
+	 * @param index
+	 * @param area
+	 */
+	public static void setPrintArea(Workbook wb, int index, String area) {
+		wb.setPrintArea(index, area);
+	}
+	
+	/**
+	 * 
+	 * @param wb
+	 * @param index
+	 * @param startCol
+	 * @param endCol
+	 * @param startRow
+	 * @param endRow
+	 */
+	public static void setPrintArea(Workbook wb,
+			int index, 
+			int startCol, 
+			int endCol, 
+			int startRow, 
+			int endRow) {
+		wb.setPrintArea(index, startCol, endCol, startRow, endRow);
+	}
+	
+	/**
+	 * You can use footer as the following:
+	 * footer.setRight( "Page " + HeaderFooter.page() + " of " + HeaderFooter.numPages() );
+	 * @param sheet
+	 * @return
+	 */
+	public static Footer getFooter(Sheet sheet) {
+		return sheet.getFooter();
+	}
+	
+	/**
+	 * Shift rows firstRow-lastRow on the spreadsheet
+	 * rows can be + or -
+	 * @param sheet
+	 * @param firstRow
+	 * @param lastRow
+	 * @param rows
+	 */
+	public static void shiftRows(Sheet sheet, int firstRow, int lastRow, int rows) {
+		sheet.shiftRows(firstRow, lastRow, rows);
+	}
+	
+	/**
+	 * set the zoom magnification
+	 * @param sheet
+	 * @param percent
+	 */
+	public static void setZoom(Sheet sheet, int percent) {
+		sheet.setZoom(percent);
+	}
+	
+	public static String getHyperLink(Cell cell) {
+		Hyperlink link = cell.getHyperlink();
+		if(null != link) {
+			return link.getAddress();
+		}
+		return null;
+	}
 }
